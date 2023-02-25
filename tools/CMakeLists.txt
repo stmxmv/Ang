@@ -1,0 +1,2 @@
+add_subdirectory(CppScanner)
+add_subdirectory(TextFilter)

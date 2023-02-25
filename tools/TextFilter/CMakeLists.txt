@@ -1,0 +1,1 @@
+add_an_tool(TextFilter main.cpp)
