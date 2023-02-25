@@ -21,7 +21,6 @@ class Token {
     friend class Lexer;
 
 public:
-
     Token() : kind(tok::TokenKind::unknown), ptr(), length() {}
 
     bool is(tok::TokenKind K) const { return kind == K; }
@@ -52,7 +51,7 @@ public:
 
     std::string_view getIdentifier() {
         assert(is(tok::TokenKind::identifier) && "Cannot get identfier of non-identifier");
-        return { ptr, length };
+        return {ptr, length};
     }
 
     const char *getName() const {
@@ -60,16 +59,15 @@ public:
     }
 
     std::string_view getRawData() {
-        return { ptr, length };
+        return {ptr, length};
     }
 
     bool isKeyword() const {
         return tok::isTokenKeyword(kind);
     }
-
 };
 
 
-}
+}// namespace AN
 
 #endif//ANG_TOKEN_HPP

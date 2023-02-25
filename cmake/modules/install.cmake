@@ -4,7 +4,7 @@
 message("install prefix is ${CMAKE_INSTALL_PREFIX}")
 
 # make uninstall
-if(NOT TARGET uninstall)
+if (NOT TARGET uninstall)
     configure_file(
             "cmake/modules/uninstall.cmake.in"
             "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake"
@@ -12,7 +12,7 @@ if(NOT TARGET uninstall)
 
     add_custom_target(uninstall
             COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake)
-endif()
+endif ()
 
 
 # Version Information

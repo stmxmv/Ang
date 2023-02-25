@@ -4,8 +4,8 @@
 
 #include <chrono>
 #include <ctime>
-#include <random>
 #include <fstream>
+#include <random>
 #include <string_view>
 #include <unordered_set>
 
@@ -58,10 +58,10 @@ class TextGenerator {
     }
 
     bool __generateTextFile(const char *path,
-                          int wordCount,
-                          int averageWordLength,
-                          char wordSplit,
-                          const char characterSet[], int setSize) {
+                            int wordCount,
+                            int averageWordLength,
+                            char wordSplit,
+                            const char characterSet[], int setSize) {
 
 
         std::ofstream file(path);
@@ -83,7 +83,6 @@ class TextGenerator {
             if (wordSplit) {
                 file << wordSplit;
             }
-
         }
 
         file.close();
@@ -92,7 +91,6 @@ class TextGenerator {
     }
 
 public:
-
     TextGenerator() : generator(_get_seed()) {}
 
 
@@ -113,7 +111,6 @@ public:
                                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         return __generateTextFile(path, wordCount, averageWordLength, ' ', chrs, sizeof chrs - 1);
     }
-
 };
 
 class TextFilter {
@@ -167,7 +164,6 @@ class TextFilter {
     }
 
 public:
-
     bool init(const char *bannedFileName) {
         return __initBannedWordSet(bannedFileName);
     }
@@ -193,7 +189,6 @@ public:
         curPtr = buffer.c_str();
 
         while (filter_one()) {
-
         }
 
         curPtr = nullptr;
@@ -201,11 +196,10 @@ public:
 
         return true;
     }
-
 };
 
 
-int main(int argc, const char * argv[]) {
+int main(int argc, const char *argv[]) {
 
 
     TextGenerator textGenerator;
@@ -217,7 +211,6 @@ int main(int argc, const char * argv[]) {
     if (textFilter.init("banned.txt")) {
 
         textFilter.filterFile("rand.txt", "rand_filtered.txt");
-
     }
 
     return 0;

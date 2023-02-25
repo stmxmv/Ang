@@ -48,12 +48,11 @@ int main(int argc, const char *argv[]) {
             auto outputName = (token.isKeyword() ? "Keyword "s + token.getName() : token.getName());
             outFile << '(' << outputName
                     << ", " << token.getRawData() << ')' << '\n';
-//            printf("(%s, %s)\n", AN::tok::getTokenCategoryString(token.getKind()), std::string(token.getRawData()).c_str());
+            //            printf("(%s, %s)\n", AN::tok::getTokenCategoryString(token.getKind()), std::string(token.getRawData()).c_str());
         }
 
 
     } while (token.getKind() != AN::tok::eof);
-
 
 
     return 0;

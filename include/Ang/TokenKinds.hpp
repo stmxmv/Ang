@@ -21,6 +21,6 @@ const char *getTokenName(TokenKind Kind);
 
 bool isTokenKeyword(TokenKind kind);
 
-}
+}// namespace AN::tok
 
-#endif //ANG_TOKENKINDS_H
+#endif//ANG_TOKENKINDS_H

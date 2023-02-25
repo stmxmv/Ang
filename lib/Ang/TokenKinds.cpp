@@ -5,17 +5,16 @@
 #include "Ang/TokenKinds.hpp"
 #include <cstdlib>
 
-static const char * const TokNames[] = {
-#define TOK(ID) #ID,
+static const char *const TokNames[] = {
+#define TOK(ID)           #ID,
 #define KEYWORD(ID, FLAG) #ID,
 #include "Ang/TokenKinds.def"
 #undef KEYWORD
-        nullptr
-};
+        nullptr};
 
 const char *AN::tok::getTokenName(AN::tok::TokenKind Kind) {
     if (Kind < tok::TokenKind::num) {
-        return TokNames[(size_t)Kind];
+        return TokNames[(size_t) Kind];
     }
     // TODO error abort
     return nullptr;
@@ -24,7 +23,8 @@ const char *AN::tok::getTokenName(AN::tok::TokenKind Kind) {
 bool AN::tok::isTokenKeyword(AN::tok::TokenKind kind) {
     switch (kind) {
 #define KEYWORD(NAME, FLAGS) \
-    case tok::kw_##NAME: return true;
+    case tok::kw_##NAME:     \
+        return true;
 #include "Ang/TokenKinds.def"
 #undef KEYWORD
         default:
@@ -32,4 +32,3 @@ bool AN::tok::isTokenKeyword(AN::tok::TokenKind kind) {
     }
     return false;
 }
-

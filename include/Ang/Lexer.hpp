@@ -19,7 +19,6 @@ class KeywordFilter {
                     tok::TokenKind TokenCode);
 
 public:
-
     void initializeKeywords();
 
     tok::TokenKind getKeyword(
@@ -40,7 +39,7 @@ class Lexer {
     KeywordFilter keywordFilter;
 
     void formToken(Token &Result, const char *TokEnd,
-                          tok::TokenKind Kind);
+                   tok::TokenKind Kind);
 
     void formIdentifier(Token &result);
 
@@ -55,18 +54,14 @@ class Lexer {
     void ignoreMultiLineComment();
 
 public:
-
     explicit Lexer(const char *aSource) : source(aSource), curPtr(aSource) {
         keywordFilter.initializeKeywords();
     }
 
 
     void next(Token &Result);
-
-
-
 };
 
-}
+}// namespace AN
 
 #endif//ANG_LEXER_HPP

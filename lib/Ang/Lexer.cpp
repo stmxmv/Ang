@@ -304,7 +304,6 @@ void AN::Lexer::formNumber(AN::Token &result) {
                 point = true;
             } else {
                 /// TODO illegal number report, double point
-
             }
 
         } else if (!charinfo::isDigit(*end)) {
@@ -321,7 +320,6 @@ void AN::Lexer::formNumber(AN::Token &result) {
     } else {
         formToken(result, end, tok::integer_literal);
     }
-
 }
 
 void AN::Lexer::formChar(AN::Token &result) {

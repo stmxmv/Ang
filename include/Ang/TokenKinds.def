@@ -1,3 +1,4 @@
+// clang-format off
 #ifndef TOK
 #define TOK(ID)
 #endif
@@ -207,3 +208,4 @@ KEYWORD(__has_cpp_attribute, KEYPREPROCESS)
 #undef KEYWORD
 #undef PUNCTUATOR
 #undef TOK
+// clang-format on

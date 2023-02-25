@@ -7,16 +7,16 @@ if (MSVC)
     add_compile_options(#[[$<$<CONFIG:Debug>:/analyze>]] /Zc:__cplusplus /await:strict /source-charset:utf-8 /execution-charset:utf-8)
     add_compile_definitions(NOMINMAX)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-else()
+else ()
     set(CMAKE_CXX_STANDARD 20)
-endif()
+endif ()
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-nullability-completeness")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-nullability-completeness")
-endif()
+endif ()
 
 message("debug flag: ${CMAKE_CXX_FLAGS_DEBUG}")
 message("release with debug info flag: ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
@@ -25,16 +25,16 @@ message("release flag: ${CMAKE_CXX_FLAGS_RELEASE}")
 
 # /////////// platform specific settings
 set(Ang_USE_VULKAN TRUE)
-if(APPLE)
+if (APPLE)
     set(Ang_USE_VULKAN FALSE)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
     # append third-party lib
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
         #    list(APPEND CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/thirdparty/osx)
-    endif()
-elseif(WIN32)
+    endif ()
+elseif (WIN32)
     list(APPEND CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/thirdparty/win32)
-endif()
+endif ()
 
 # /////////// platform specific settings
 
@@ -48,9 +48,9 @@ include_directories(thirdparty/include)
 
 
 option(VLD_MEM_CHECK "use vld to check memory" OFF)
-if(VLD_MEM_CHECK)
+if (VLD_MEM_CHECK)
     add_compile_definitions($<$<CONFIG:Debug>:VLD_MEM_CHECK>)
-endif()
+endif ()
 
 #add_subdirectory(thirdparty)
 add_subdirectory(lib)
@@ -66,7 +66,7 @@ if (AN_BUILD_TEST)
     FetchContent_Declare(
             googletest
             GIT_REPOSITORY https://github.com/google/googletest.git
-            GIT_TAG        release-1.12.1
+            GIT_TAG release-1.12.1
     )
     # For Windows: Prevent overriding the parent project's compiler/linker settings
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -78,8 +78,7 @@ if (AN_BUILD_TEST)
 
     add_subdirectory(test)
 
-endif()
-
+endif ()
 
 
 # finally include install module
