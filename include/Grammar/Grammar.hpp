@@ -5,11 +5,16 @@
 #ifndef ANG_GRAMMER_HPP
 #define ANG_GRAMMER_HPP
 
+#include "Grammar/ASTContext.hpp"
+
 #include <string_view>
 #include <utility>
 #include <vector>
+#include <unordered_map>
 
 namespace AN::grammar {
+
+
 
 enum GrammarType : unsigned long {
     GrammarTypeUnknown  = 0,
@@ -21,65 +26,97 @@ enum GrammarType : unsigned long {
     GrammarTypeRG       = 1 << 5,
 };
 
-class Symbol {
+class Symbol : public ASTAllocated<Symbol> {
     std::string_view val;
 public:
-    enum ValueKind { Unknown, TSymbol, VSymbol };
+    enum SymbolKind { UnknownSymbol, TSymbol, VSymbol };
 
-    Symbol() : valueKind(Unknown) {}
+    enum ValueType { UnknownValueType, Identifier, CharLiteral, StringLiteral, FloatLiteral, IntegerLiteral };
 
-    Symbol(std::string_view val, ValueKind valueKind) : val(val), valueKind(valueKind) {}
+    Symbol() : symbolKind(UnknownSymbol), valueType(UnknownValueType) {}
+
+    Symbol(std::string_view val, SymbolKind valueKind, ValueType valueType)
+        : val(val), symbolKind(valueKind), valueType(valueType) {}
 
     const std::string_view &getVal() const {
         return val;
     }
 
-    ValueKind getKind() const {
-        return valueKind;
+    SymbolKind getSymbolKind() const {
+        return symbolKind;
+    }
+
+    ValueType getValueType() const {
+        return valueType;
+    }
+
+    void setValueKind(SymbolKind aValueKind) {
+        symbolKind = aValueKind;
     }
 
 private:
-    ValueKind valueKind;
+    SymbolKind symbolKind;
+    ValueType valueType;
 };
 
-class Production {
-    std::vector<Symbol> left_symbols;
-    std::vector<Symbol> right_symbols;
+class Production : public ASTAllocated<Production> {
+    std::vector<Symbol *> left_symbols;
+    std::vector<Symbol *> right_symbols;
 
 public:
-    Production(std::vector<Symbol> leftSymbols,
-               std::vector<Symbol> rightSymbols)
+    Production(std::vector<Symbol *> leftSymbols,
+               std::vector<Symbol *> rightSymbols)
         : left_symbols(std::move(leftSymbols)), right_symbols(std::move(rightSymbols)) {}
 
     GrammarType getType() const;
 
+    const std::vector<Symbol *> &getLeftSymbols() const {
+        return left_symbols;
+    }
+    const std::vector<Symbol *> &getRightSymbols() const {
+        return right_symbols;
+    }
 };
 
-class GrammarTitle {
+class GrammarTitle : public ASTAllocated<GrammarTitle> {
     std::string_view name;
-    Symbol start_symbol;
+    Symbol *start_symbol;
 public:
-    GrammarTitle(const std::string_view &name, const Symbol &startSymbol) : name(name), start_symbol(startSymbol) {}
+    GrammarTitle(const std::string_view &name, Symbol *startSymbol) : name(name), start_symbol(startSymbol) {}
 
     const std::string_view &getName() const {
         return name;
     }
-    const Symbol &getStartSymbol() const {
+    const Symbol *getStartSymbol() const {
         return start_symbol;
     }
 };
 
-class Grammar {
-
-    std::vector<Production> products;
-
-
+class Grammar : public ASTAllocated<Grammar> {
+    GrammarTitle *grammarTitle;
+    std::vector<Production *> products;
+    std::unordered_map<std::string_view, Symbol *> symbol_map;
 public:
 
-    explicit Grammar(std::vector<Production> products) : products(std::move(products)) {}
+    Grammar(GrammarTitle *grammarTitle,
+            std::vector<Production *> products,
+            std::unordered_map<std::string_view, Symbol *> symbol_map)
+        : grammarTitle(grammarTitle), products(std::move(products)), symbol_map(std::move(symbol_map)) {}
 
     GrammarType getType() const;
 
+    GrammarTitle *getGrammarTitle() const { return grammarTitle; }
+
+    Symbol *getSymbolByVal(std::string_view val) {
+        if (auto iter = symbol_map.find(val); iter != symbol_map.end()) {
+            return iter->second;
+        }
+        return nullptr;
+    }
+
+    const std::vector<Production *> &getProductions() const {
+        return products;
+    }
 };
 
 

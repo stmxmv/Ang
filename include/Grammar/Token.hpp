@@ -20,6 +20,10 @@ enum TokenKind {
     separator,
     left_bracket,
     right_bracket,
+    char_literal,
+    string_literal,
+    float_literal,
+    integer_literal,
     num
 };
 

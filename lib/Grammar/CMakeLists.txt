@@ -1,6 +1,7 @@
 add_an_library(
-        libgrammer SHARED
+        libgrammar SHARED
         Lexer.cpp
         Parser.cpp
         Grammar.cpp
+        ASTContext.cpp
 )

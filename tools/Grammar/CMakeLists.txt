@@ -1,1 +1,3 @@
-add_an_tool(grammer main.cpp)
+add_an_tool(grammar main.cpp)
+
+target_link_libraries(grammar PRIVATE libgrammar)

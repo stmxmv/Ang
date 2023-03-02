@@ -65,6 +65,19 @@ void Lexer::next(Token &result) {
         return;
     }
 
+    if (charinfo::isDigit(*curPtr)) {
+        formNumber(result);
+        return;
+    }
+    if (*curPtr == '\'') {
+        formChar(result);
+        return;
+    }
+    if (*curPtr == '"') {
+        formString(result);
+        return;
+    }
+
     switch (*curPtr) {
         case '[':
             formToken(result, curPtr + 1, tok::left_bracket);
@@ -89,6 +102,69 @@ void Lexer::next(Token &result) {
             formToken(result, curPtr + 1, tok::unknown);
             return;
     }
+}
+
+void Lexer::formNumber(Token &result) {
+    const char *start = curPtr;
+    const char *end   = curPtr + 1;
+
+    bool point = false;
+
+    // check hex start
+    if (*start == '0' && *end == 'x') {
+        ++end;
+    }
+
+    for (;;) {
+
+        if (*end == '.') {
+            if (!point) {
+                point = true;
+            } else {
+                /// TODO illegal number report, double point
+            }
+
+        } else if (!charinfo::isDigit(*end)) {
+            break;
+        }
+
+        ++end;
+    }
+
+    /// TODO check number literal suffix
+
+    if (point) {
+        formToken(result, end, tok::float_literal);
+    } else {
+        formToken(result, end, tok::integer_literal);
+    }
+}
+
+void Lexer::formChar(Token &result) {
+    const char *start = curPtr;
+    const char *end   = curPtr + 1;
+
+    while (*end && (*end != *start || *(end - 1) == '\\') && !charinfo::isVerticalWhitespace(*end)) {
+        ++end;
+    }
+
+    /// TODO report error on *end is vertical whitespace
+
+    /// *end = *start
+    formToken(result, end + 1, tok::char_literal);
+}
+
+void Lexer::formString(Token &result) {
+    const char *start = curPtr;
+    const char *end   = curPtr + 1;
+
+    while (*end && (*end != *start || *(end - 1) == '\\') && !charinfo::isVerticalWhitespace(*end)) {
+        ++end;
+    }
+    /// TODO report error on *end is vertical whitespace
+
+    /// *end = *start
+    formToken(result, end + 1, tok::string_literal);
 }
 
 void Lexer::formIdentifier(Token &result) {

@@ -16,6 +16,12 @@ class Lexer {
     void formToken(Token &Result, const char *TokEnd,
                    tok::TokenKind Kind);
 
+    void formNumber(Token &result);
+
+    void formChar(Token &result);
+
+    void formString(Token &result);
+
     void formIdentifier(Token &result);
 
 public:
