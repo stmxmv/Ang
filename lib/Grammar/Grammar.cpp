@@ -10,30 +10,36 @@ namespace AN::grammar {
 
 GrammarType grammar::Production::getType() const {
     GrammarType type = GrammarTypePSG;
-
     if (left_symbols.size() <= right_symbols.size()) {
-        type = GrammarTypeCSG;
+        type =  GrammarTypeCSG;
     }
 
     if (left_symbols.size() == 1 && left_symbols.front().getKind() == Symbol::VSymbol) {
-        type = GrammarTypeCFG;
+        type =  GrammarTypeCFG;
 
         if (!right_symbols.empty()) {
             // check RG
             if (std::all_of(right_symbols.begin(), right_symbols.end(), [](auto &&symbol) {
                     return symbol.getKind() == Symbol::TSymbol;
                 })) {
-
+                type = GrammarTypeRG;
             }
 
             if (right_symbols.front().getKind() == Symbol::VSymbol) {
 
+                if (std::all_of(right_symbols.begin() + 1, right_symbols.end(), [](auto &&symbol) {
+                        return symbol.getKind() == Symbol::TSymbol;
+                    })) {
+                    type = GrammarTypeRG_left;
+                }
 
             } else if (right_symbols.back().getKind() == Symbol::VSymbol) {
-
-
+                if (std::all_of(right_symbols.begin(), right_symbols.end() - 1, [](auto &&symbol) {
+                        return symbol.getKind() == Symbol::TSymbol;
+                    })) {
+                    type =  GrammarTypeRG_right;
+                }
             }
-
         }
     }
 
@@ -46,14 +52,19 @@ GrammarType Grammar::getType() const {
         type |= production.getType();
     }
 
-    if ((type & GrammarTypeRG_left) && (type & GrammarTypeRG_right)) {
-        return GrammarTypeCFG;
-    }
+    uint64_t flag = GrammarTypePSG;
 
-    uint64_t flag = 1;
     while (!(type & flag)) {
         flag <<= 1;
     }
+
+    if (flag & (GrammarTypeRG | GrammarTypeRG_left | GrammarTypeRG_right)) {
+        if ((type & GrammarTypeRG_left) && (type & GrammarTypeRG_right)) {
+            return GrammarTypeCFG;
+        }
+    }
+
+
     return (GrammarType)flag;
 }
 
