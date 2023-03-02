@@ -7,6 +7,7 @@
 
 #include "Grammar/Lexer.hpp"
 #include "Grammar/Grammar.hpp"
+#include <memory>
 
 namespace AN::grammar {
 
@@ -38,6 +39,7 @@ public:
         advance();
     }
 
+    std::shared_ptr<Grammar> parse();
 
 };
 

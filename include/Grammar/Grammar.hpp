@@ -26,6 +26,8 @@ class Symbol {
 public:
     enum ValueKind { Unknown, TSymbol, VSymbol };
 
+    Symbol() : valueKind(Unknown) {}
+
     Symbol(std::string_view val, ValueKind valueKind) : val(val), valueKind(valueKind) {}
 
     const std::string_view &getVal() const {
@@ -53,9 +55,24 @@ public:
 
 };
 
+class GrammarTitle {
+    std::string_view name;
+    Symbol start_symbol;
+public:
+    GrammarTitle(const std::string_view &name, const Symbol &startSymbol) : name(name), start_symbol(startSymbol) {}
+
+    const std::string_view &getName() const {
+        return name;
+    }
+    const Symbol &getStartSymbol() const {
+        return start_symbol;
+    }
+};
+
 class Grammar {
 
     std::vector<Production> products;
+
 
 public:
 
