@@ -10,7 +10,8 @@ static const char *const TokNames[] = {
 #define KEYWORD(ID, FLAG) #ID,
 #include "Ang/TokenKinds.def"
 #undef KEYWORD
-        nullptr};
+        nullptr
+};
 
 const char *AN::tok::getTokenName(AN::tok::TokenKind Kind) {
     if (Kind < tok::TokenKind::num) {

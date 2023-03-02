@@ -41,18 +41,17 @@ int main(int argc, const char *argv[]) {
 
     AN::Token token;
 
-    do {
+    for (;;) {
         lexer.next(token);
 
         if (token.getKind() != AN::tok::eof) {
             auto outputName = (token.isKeyword() ? "Keyword "s + token.getName() : token.getName());
-            outFile << '(' << outputName
-                    << ", " << token.getRawData() << ')' << '\n';
+            outFile << '(' << outputName << ", " << token.getRawData() << ')' << '\n';
             //            printf("(%s, %s)\n", AN::tok::getTokenCategoryString(token.getKind()), std::string(token.getRawData()).c_str());
+        } else {
+            break;
         }
-
-
-    } while (token.getKind() != AN::tok::eof);
+    }
 
 
     return 0;

@@ -1,2 +1,3 @@
 add_subdirectory(CppScanner)
 add_subdirectory(TextFilter)
+add_subdirectory(Grammar)

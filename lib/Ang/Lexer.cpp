@@ -63,12 +63,6 @@ start:
         ++curPtr;
     }
 
-    /// check if end of string
-    if (!*curPtr) {
-        result.setKind(tok::eof);
-        return;
-    }
-
     /// ignore comments
     if (*curPtr == '/') {
         if (*(curPtr + 1) == '/') {
@@ -79,6 +73,12 @@ start:
             ignoreMultiLineComment();
             goto start;
         }
+    }
+
+    /// check if end of string
+    if (!*curPtr) {
+        result.setKind(tok::eof);
+        return;
     }
 
 
@@ -378,7 +378,7 @@ void AN::Lexer::ignoreMultiLineComment() {
 void AN::Lexer::formToken(AN::Token &Result, const char *TokEnd, AN::tok::TokenKind Kind) {
     size_t TokLen = TokEnd - curPtr;
     Result.ptr    = curPtr;
-    ;
+
     Result.length = TokLen;
     Result.kind   = Kind;
     curPtr        = TokEnd;
