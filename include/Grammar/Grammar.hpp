@@ -76,6 +76,9 @@ public:
     const std::vector<Symbol *> &getRightSymbols() const {
         return right_symbols;
     }
+
+    std::string getPrettyString() const;
+
 };
 
 class GrammarTitle : public ASTAllocated<GrammarTitle> {
@@ -90,6 +93,8 @@ public:
     const Symbol *getStartSymbol() const {
         return start_symbol;
     }
+
+    std::string getPrettyString() const;
 };
 
 class Grammar : public ASTAllocated<Grammar> {
@@ -117,6 +122,8 @@ public:
     const std::vector<Production *> &getProductions() const {
         return products;
     }
+
+    std::string getPrettyString() const;
 };
 
 

@@ -41,15 +41,21 @@ const char *SymbolKindToString(AN::grammar::Symbol::SymbolKind type) {
 
 int main(int argc, const char *argv[]) {
 
-    if (argc <= 1) {
+    if (argc <= 2) {
         puts(USAGE_STRING);
         return -1;
     }
 
     std::ifstream file(argv[1]);
+    std::ofstream outFile(argv[2]);
 
     if (!file.is_open()) {
         printf("Open input file error at path %s", argv[1]);
+        return -1;
+    }
+
+    if (!outFile.is_open()) {
+        printf("Create output file error at path %s", argv[1]);
         return -1;
     }
 
@@ -66,6 +72,10 @@ int main(int argc, const char *argv[]) {
     AN::grammar::Parser parser(context, lexer);
 
     AN::grammar::Grammar *grammar = parser.parse();
+
+    outFile << grammar->getPrettyString();
+    outFile.close();
+
     std::cout << "Grammar title is " << grammar->getGrammarTitle()->getName() <<
             " start symbol is " << grammar->getGrammarTitle()->getStartSymbol()->getVal() << '\n';
 
@@ -92,7 +102,6 @@ int main(int argc, const char *argv[]) {
 
 
     printf("Grammar type is %s\n", GrammarTypeToString(grammar->getType()));
-
 
     return 0;
 }

@@ -13,32 +13,30 @@ GrammarType grammar::Production::getType() const {
     GrammarType type = GrammarTypePSG;
     if (left_symbols.size() <= right_symbols.size()) {
         type =  GrammarTypeCSG;
-    }
-
-    if (left_symbols.size() == 1 && left_symbols.front()->getSymbolKind() == Symbol::VSymbol) {
-        type =  GrammarTypeCFG;
-
-        if (!right_symbols.empty()) {
-            // check RG
-            if (std::all_of(right_symbols.begin(), right_symbols.end(), [](auto &&symbol) {
-                    return symbol->getSymbolKind() == Symbol::TSymbol;
-                })) {
-                type = GrammarTypeRG;
-            }
-
-            if (right_symbols.front()->getSymbolKind() == Symbol::VSymbol) {
-
-                if (std::all_of(right_symbols.begin() + 1, right_symbols.end(), [](auto &&symbol) {
+        if (left_symbols.size() == 1 && left_symbols.front()->getSymbolKind() == Symbol::VSymbol) {
+            type =  GrammarTypeCFG;
+            if (!right_symbols.empty()) {
+                // check RG
+                if (std::all_of(right_symbols.begin(), right_symbols.end(), [](auto &&symbol) {
                         return symbol->getSymbolKind() == Symbol::TSymbol;
                     })) {
-                    type = GrammarTypeRG_left;
+                    type = GrammarTypeRG;
                 }
 
-            } else if (right_symbols.back()->getSymbolKind() == Symbol::VSymbol) {
-                if (std::all_of(right_symbols.begin(), right_symbols.end() - 1, [](auto &&symbol) {
-                        return symbol->getSymbolKind() == Symbol::TSymbol;
-                    })) {
-                    type =  GrammarTypeRG_right;
+                if (right_symbols.front()->getSymbolKind() == Symbol::VSymbol) {
+
+                    if (std::all_of(right_symbols.begin() + 1, right_symbols.end(), [](auto &&symbol) {
+                            return symbol->getSymbolKind() == Symbol::TSymbol;
+                        })) {
+                        type = GrammarTypeRG_left;
+                    }
+
+                } else if (right_symbols.back()->getSymbolKind() == Symbol::VSymbol) {
+                    if (std::all_of(right_symbols.begin(), right_symbols.end() - 1, [](auto &&symbol) {
+                            return symbol->getSymbolKind() == Symbol::TSymbol;
+                        })) {
+                        type =  GrammarTypeRG_right;
+                    }
                 }
             }
         }
@@ -59,14 +57,58 @@ GrammarType Grammar::getType() const {
         flag <<= 1;
     }
 
-    if (flag & (GrammarTypeRG | GrammarTypeRG_left | GrammarTypeRG_right)) {
-        if ((type & GrammarTypeRG_left) && (type & GrammarTypeRG_right)) {
-            return GrammarTypeCFG;
-        }
+    if ((flag & GrammarTypeRG_right) && (type & GrammarTypeRG_left)) {
+        return GrammarTypeCFG;
     }
 
 
     return (GrammarType)flag;
+}
+
+std::string Production::getPrettyString() const {
+    std::string result;
+    // left
+    for (const Symbol *symbol : left_symbols) {
+        result.append(symbol->getVal());
+        result.push_back(' ');
+    }
+
+    result.append("-> ");
+
+    // right
+    for (const Symbol *symbol : right_symbols) {
+        result.append(symbol->getVal());
+        result.push_back(' ');
+    }
+
+    result.back() = ';';
+
+    return result;
+}
+
+std::string GrammarTitle::getPrettyString() const {
+    std::string result;
+
+    result.append(name);
+    result.push_back('[');
+    result.append(start_symbol->getVal());
+    result.append("];");
+
+    return result;
+}
+
+
+std::string Grammar::getPrettyString() const {
+    std::string result;
+    result.append(grammarTitle->getPrettyString());
+    result.push_back('\n');
+
+    for (const Production *production : products) {
+        result.append(production->getPrettyString());
+        result.push_back('\n');
+    }
+
+    return result;
 }
 
 }

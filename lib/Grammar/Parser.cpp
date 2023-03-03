@@ -36,10 +36,9 @@ GrammarTitle *Parser::parseGrammarTitle() {
         grammar_name = token.getRawData();
         advance();
         if (consume(tok::left_bracket)) {
-            if (expectOneOf(SYMBOL_TOKEN_TYPE)) {
+            if (expect(tok::identifier)) {
                 startSymbol = new(context) Symbol(token.getRawData(), Symbol::VSymbol, toSymbolValueType(token.getKind()));
                 symbol_map[token.getRawData()] = startSymbol;
-                left_symbols.insert(startSymbol);
                 advance();
                 if (!consume(tok::right_bracket) || !consume(tok::delimiter)) {
                     goto __error;
@@ -76,13 +75,12 @@ std::vector<Production *> Parser::parseProduction() {
     while (token.isOneOf(SYMBOL_TOKEN_TYPE)) {
         Symbol *sym = getSymbol(token.getRawData());
         if (!sym) {
-            // currently the symbol is whether V or T  is unknown
-            sym = new (context) Symbol(token.getRawData(), Symbol::UnknownSymbol, toSymbolValueType(token.getKind()));
+            sym = new (context) Symbol(token.getRawData(), token.is(tok::identifier) ? Symbol::VSymbol : Symbol::TSymbol,
+                                                                  toSymbolValueType(token.getKind()));
             symbol_map[token.getRawData()] = sym;
         }
 
         pro_left_symbols.push_back(sym);
-        left_symbols.insert(sym);
         advance();
     }
 
@@ -92,7 +90,7 @@ std::vector<Production *> Parser::parseProduction() {
     }
 
     /// right side
-    if (!expect(tok::identifier)) {
+    if (!expectOneOf(SYMBOL_TOKEN_TYPE)) {
         goto __error;
     }
 
@@ -100,10 +98,10 @@ std::vector<Production *> Parser::parseProduction() {
         Symbol *sym = getSymbol(token.getRawData());
         if (!sym) {
             // currently the symbol is whether V or T  is unknown
-            sym = new (context) Symbol(token.getRawData(), Symbol::UnknownSymbol, toSymbolValueType(token.getKind()));
+            sym = new (context) Symbol(token.getRawData(), token.is(tok::identifier) ? Symbol::VSymbol : Symbol::TSymbol,
+                                                                  toSymbolValueType(token.getKind()));
             symbol_map[token.getRawData()] = sym;
         }
-        right_symbols.insert(sym);
         pro_right_symbols.push_back(sym);
         advance();
 
@@ -112,7 +110,7 @@ std::vector<Production *> Parser::parseProduction() {
             productions.push_back(production);
             pro_right_symbols.clear();
             advance();
-            if (!expect(tok::identifier)) {
+            if (!expectOneOf(SYMBOL_TOKEN_TYPE)) {
                 goto __error;
             }
         }
@@ -140,22 +138,6 @@ Grammar *Parser::parse() {
     while (token.isNot(tok::eof)) {
         std::vector<Production *> parsedProducts = parseProduction();
         products.insert(products.end(), parsedProducts.begin(), parsedProducts.end());
-    }
-
-    /// evaluate V and T symbols
-    for (Symbol *sym : left_symbols) {
-        if (right_symbols.find(sym) != right_symbols.end()) {
-            right_symbols.erase(sym);
-        }
-    }
-
-    /// set symbol value kind
-    for (Symbol *sym: left_symbols) {
-        sym->setValueKind(Symbol::VSymbol);
-    }
-
-    for (Symbol *sym: right_symbols) {
-        sym->setValueKind(Symbol::TSymbol);
     }
 
     /// construct Grammar

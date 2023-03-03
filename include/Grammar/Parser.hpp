@@ -22,8 +22,6 @@ class Parser {
 
     std::unordered_map<std::string_view, Symbol *> symbol_map;
 
-    std::unordered_set<Symbol *> left_symbols, right_symbols;
-
     void advance() {
         lexer.next(token);
     }
@@ -38,7 +36,11 @@ class Parser {
 
     template<typename... Ts>
     bool expectOneOf(tok::TokenKind K1, Ts... Ks) {
-        return expect(K1) || expectOneOf(Ks...);
+        if (token.isOneOf(K1, Ks...)) {
+            return true;
+        }
+        error();
+        return false;
     }
 
     bool consume(tok::TokenKind tokenKind) {
