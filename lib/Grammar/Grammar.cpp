@@ -30,33 +30,35 @@ GrammarType grammar::Production::getType() const {
                 type = GrammarTypeRG;
             }
 
-            /// right_symbols not empty, OK to access front and back
+            /// like A -> B is not RG, right_symbols size must > 1 when there are V symbols in it
+            if (right_symbols.size() > 1) {
+                if (right_symbols.front()->getSymbolKind() == Symbol::VSymbol) {
 
-            if (right_symbols.front()->getSymbolKind() == Symbol::VSymbol) {
+                    if (std::all_of(right_symbols.begin() + 1, right_symbols.end(), [](auto &&symbol) {
+                            return symbol->getSymbolKind() == Symbol::TSymbol;
+                        })) {
+                        type = GrammarTypeRG_left;
+                    }
 
-                if (std::all_of(right_symbols.begin() + 1, right_symbols.end(), [](auto &&symbol) {
-                        return symbol->getSymbolKind() == Symbol::TSymbol;
-                    })) {
-                    type = GrammarTypeRG_left;
-                }
-
-            } else if (right_symbols.back()->getSymbolKind() == Symbol::VSymbol) {
-                if (std::all_of(right_symbols.begin(), right_symbols.end() - 1, [](auto &&symbol) {
-                        return symbol->getSymbolKind() == Symbol::TSymbol;
-                    })) {
-                    type = GrammarTypeRG_right;
+                } else if (right_symbols.back()->getSymbolKind() == Symbol::VSymbol) {
+                    if (std::all_of(right_symbols.begin(), right_symbols.end() - 1, [](auto &&symbol) {
+                            return symbol->getSymbolKind() == Symbol::TSymbol;
+                        })) {
+                        type = GrammarTypeRG_right;
+                    }
                 }
             }
         }
 
     } else {
 
-        if (left_symbols.size() == 1 &&
-            left_symbols.front()->getSymbolKind() == Symbol::VSymbol &&
-            right_symbols.empty()) {
-
-            /// epsilon
-            type = GrammarTypeRG;
+        /// handle epsilon
+        if (right_symbols.empty()) {
+            if (left_symbols.size() == 1 && left_symbols.front()->getSymbolKind() == Symbol::VSymbol) {
+                type = GrammarTypeRG;
+            } else {
+                type = GrammarTypeCSG;
+            }
         }
     }
 
