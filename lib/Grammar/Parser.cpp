@@ -71,7 +71,7 @@ std::vector<Production *> Parser::parseProduction() {
         goto __error;
     }
 
-    // parse left side of the production
+    /// parse left side of the production
     while (token.isOneOf(SYMBOL_TOKEN_TYPE)) {
         Symbol *sym = getSymbol(token.getRawData());
         if (!sym) {
@@ -91,7 +91,15 @@ std::vector<Production *> Parser::parseProduction() {
 
     /// right side
     if (!expectOneOf(SYMBOL_TOKEN_TYPE)) {
-        goto __error;
+
+        /// right side can have no symbols ( epsilon )
+
+        if (!consume(tok::delimiter)) {
+            goto __error;
+        }
+
+        productions.push_back(new(context) Production(pro_left_symbols, {}));
+        return productions;
     }
 
     while (token.isOneOf(SYMBOL_TOKEN_TYPE)) {

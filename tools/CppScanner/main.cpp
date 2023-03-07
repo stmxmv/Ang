@@ -1,4 +1,5 @@
 #include "Ang/Lexer.hpp"
+#include "Basic/SourceFile.hpp"
 #include <cstdio>
 #include <fstream>
 #include <sstream>
@@ -14,30 +15,27 @@ int main(int argc, const char *argv[]) {
         return -1;
     }
 
-    std::ifstream file(argv[1]);
-    std::ofstream outFile(argv[2]);
+    // init SourceFile
+    AN::SourceFile file;
+    AN::Error error;
 
-    if (!file.is_open()) {
-        printf("Open input file error at path %s", argv[1]);
+    if (!file.init(argv[1], &error)) {
+        printf("open input file error: %s", error.getDescription().c_str());
         return -1;
     }
+
+    std::ofstream outFile(argv[2]);
+
 
     if (!outFile.is_open()) {
         printf("Cannot create file at path %s", argv[2]);
         return -1;
     }
 
-    /// load file into a single buffer
-    file.seekg(0, std::ios::end);
-    size_t size = file.tellg();
-
-    std::string buffer(size, 0);
-    file.seekg(0);
-    file.read(buffer.data(), size);
 
 
     /// init lexer and process
-    AN::Lexer lexer(buffer.c_str());
+    AN::Lexer lexer(file.getBuffer());
 
     AN::Token token;
 

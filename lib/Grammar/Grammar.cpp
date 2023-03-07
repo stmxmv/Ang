@@ -12,10 +12,19 @@ namespace AN::grammar {
 GrammarType grammar::Production::getType() const {
     GrammarType type = GrammarTypePSG;
     if (left_symbols.size() <= right_symbols.size()) {
+
         type =  GrammarTypeCSG;
+
         if (left_symbols.size() == 1 && left_symbols.front()->getSymbolKind() == Symbol::VSymbol) {
+
             type =  GrammarTypeCFG;
-            if (!right_symbols.empty()) {
+
+            if (right_symbols.empty()) {
+                /// epsilon
+
+                type = GrammarTypeRG;
+
+            } else  {
                 // check RG
                 if (std::all_of(right_symbols.begin(), right_symbols.end(), [](auto &&symbol) {
                         return symbol->getSymbolKind() == Symbol::TSymbol;

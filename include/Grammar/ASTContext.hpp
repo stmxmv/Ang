@@ -10,6 +10,7 @@
 
 namespace AN::grammar {
 
+/// \brief context to manage AST object life-circle
 class ASTContext {
     std::vector<void *> allocations;
 public:
@@ -21,7 +22,7 @@ public:
 };
 
 #ifdef _MSC_VER
-#pragma warning(disable : 4291)
+#pragma warning(disable : 4291) // ignore no matching delete operator warning
 #endif
 template <typename AlignTy>
 class ASTAllocated {
