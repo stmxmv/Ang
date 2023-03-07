@@ -9,12 +9,15 @@
 #ifndef ANG_SOURCEFILE_HPP
 #define ANG_SOURCEFILE_HPP
 
+#include "Basic/typedef.h"
 #include "Basic/Error.hpp"
 #include <string_view>
 
+
 namespace AN {
 
-class SourceFile {
+/// \brief SourceFile manages the mapping of the file into memory
+class SourceFile : private NonCopyable {
 
     const char *_buffer{};
 

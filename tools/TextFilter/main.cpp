@@ -9,6 +9,8 @@
 #include <string_view>
 #include <unordered_set>
 
+#include "Basic/SourceFile.hpp"
+
 inline bool isASCII(char Ch) {
     return static_cast<unsigned char>(Ch) <= 127;
 }
@@ -170,23 +172,20 @@ public:
 
     bool filterFile(const char *inputFileName, const char *outputFileName) {
 
-        std::ifstream inFile(inputFileName);
-        outFile = std::ofstream(outputFileName);
+        AN::SourceFile inFile;
 
-        if (!inFile.is_open() || !outFile.is_open()) {
+        if (!inFile.init(inputFileName)) {
             return false;
         }
 
-        /// load file into a single buffer
-        inFile.seekg(0, std::ios::end);
-        size_t size = inFile.tellg();
+        outFile = std::ofstream(outputFileName);
 
-        std::string buffer(size, 0);
-        inFile.seekg(0);
-        inFile.read(buffer.data(), size);
+        if (!outFile.is_open()) {
+            return false;
+        }
 
         /// do filtering
-        curPtr = buffer.c_str();
+        curPtr = inFile.getBuffer();
 
         while (filter_one()) {
         }

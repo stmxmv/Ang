@@ -89,17 +89,10 @@ std::vector<Production *> Parser::parseProduction() {
         goto __error;
     }
 
-    /// right side
-    if (!expectOneOf(SYMBOL_TOKEN_TYPE)) {
-
-        /// right side can have no symbols ( epsilon )
-
-        if (!consume(tok::delimiter)) {
-            goto __error;
-        }
-
+    /// right side can have no symbols ( epsilon )
+    if (token.is(tok::alter)) {
         productions.push_back(new(context) Production(pro_left_symbols, {}));
-        return productions;
+        advance();
     }
 
     while (token.isOneOf(SYMBOL_TOKEN_TYPE)) {
@@ -118,8 +111,11 @@ std::vector<Production *> Parser::parseProduction() {
             productions.push_back(production);
             pro_right_symbols.clear();
             advance();
-            if (!expectOneOf(SYMBOL_TOKEN_TYPE)) {
-                goto __error;
+
+            /// right side can have no symbols ( epsilon )
+            while (token.is(tok::alter)) {
+                productions.push_back(new(context) Production(pro_left_symbols, {}));
+                advance();
             }
         }
     }

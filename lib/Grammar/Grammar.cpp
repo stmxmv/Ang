@@ -8,46 +8,55 @@
 namespace AN::grammar {
 
 
-
 GrammarType grammar::Production::getType() const {
     GrammarType type = GrammarTypePSG;
+
+    /// note that left_symbols size is at least 1 or error at parsing
+
     if (left_symbols.size() <= right_symbols.size()) {
 
-        type =  GrammarTypeCSG;
+        type = GrammarTypeCSG;
 
         if (left_symbols.size() == 1 && left_symbols.front()->getSymbolKind() == Symbol::VSymbol) {
 
-            type =  GrammarTypeCFG;
+            type = GrammarTypeCFG;
 
-            if (right_symbols.empty()) {
-                /// epsilon
+            /// here right_symbols size is at least 1
 
+            /// all right symbols are T
+            if (std::all_of(right_symbols.begin(), right_symbols.end(), [](auto &&symbol) {
+                    return symbol->getSymbolKind() == Symbol::TSymbol;
+                })) {
                 type = GrammarTypeRG;
+            }
 
-            } else  {
-                // check RG
-                if (std::all_of(right_symbols.begin(), right_symbols.end(), [](auto &&symbol) {
+            /// right_symbols not empty, OK to access front and back
+
+            if (right_symbols.front()->getSymbolKind() == Symbol::VSymbol) {
+
+                if (std::all_of(right_symbols.begin() + 1, right_symbols.end(), [](auto &&symbol) {
                         return symbol->getSymbolKind() == Symbol::TSymbol;
                     })) {
-                    type = GrammarTypeRG;
+                    type = GrammarTypeRG_left;
                 }
 
-                if (right_symbols.front()->getSymbolKind() == Symbol::VSymbol) {
-
-                    if (std::all_of(right_symbols.begin() + 1, right_symbols.end(), [](auto &&symbol) {
-                            return symbol->getSymbolKind() == Symbol::TSymbol;
-                        })) {
-                        type = GrammarTypeRG_left;
-                    }
-
-                } else if (right_symbols.back()->getSymbolKind() == Symbol::VSymbol) {
-                    if (std::all_of(right_symbols.begin(), right_symbols.end() - 1, [](auto &&symbol) {
-                            return symbol->getSymbolKind() == Symbol::TSymbol;
-                        })) {
-                        type =  GrammarTypeRG_right;
-                    }
+            } else if (right_symbols.back()->getSymbolKind() == Symbol::VSymbol) {
+                if (std::all_of(right_symbols.begin(), right_symbols.end() - 1, [](auto &&symbol) {
+                        return symbol->getSymbolKind() == Symbol::TSymbol;
+                    })) {
+                    type = GrammarTypeRG_right;
                 }
             }
+        }
+
+    } else {
+
+        if (left_symbols.size() == 1 &&
+            left_symbols.front()->getSymbolKind() == Symbol::VSymbol &&
+            right_symbols.empty()) {
+
+            /// epsilon
+            type = GrammarTypeRG;
         }
     }
 
@@ -71,7 +80,7 @@ GrammarType Grammar::getType() const {
     }
 
 
-    return (GrammarType)flag;
+    return (GrammarType) flag;
 }
 
 std::string Production::getPrettyString() const {
@@ -120,4 +129,4 @@ std::string Grammar::getPrettyString() const {
     return result;
 }
 
-}
+}// namespace AN::grammar

@@ -7,8 +7,11 @@
 //===----------------------------------------------------------------------===//
 
 #include "Basic/SourceFile.hpp"
+#include <iostream>
 
 #ifdef _WIN32
+
+#include <Windows.h>
 
 #else
 
@@ -17,15 +20,14 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#include <iostream>
-
 #endif
 
 namespace AN {
 
 struct SourceFile::Impl {
 #ifdef _WIN32
-
+    HANDLE hFile;
+    HANDLE hMapFile;
 #else
     int fd;
     size_t len;
@@ -40,6 +42,75 @@ bool SourceFile::init(std::string_view path, Error *error) {
     // map file into memory
 #ifdef _WIN32
 
+    // convert to utf16 to support non-ASCII path
+    std::string const utf8Path(path);
+    std::wstring wFilePath;
+    wFilePath.resize(MultiByteToWideChar(CP_UTF8, 0, utf8Path.c_str(), (int)strlen(utf8Path.c_str()) + 1, nullptr, 0));
+    MultiByteToWideChar(CP_UTF8, 0, utf8Path.c_str(), (int)strlen(utf8Path.c_str()) + 1, wFilePath.data(), (int)wFilePath.size());
+
+    HANDLE hFile = CreateFileW(
+            wFilePath.c_str(),
+            GENERIC_READ,
+            FILE_SHARE_READ,
+            nullptr,
+            OPEN_EXISTING,
+            FILE_ATTRIBUTE_NORMAL,
+            nullptr
+    );
+
+    if (hFile == INVALID_HANDLE_VALUE) {
+        if (error) {
+            *error = Error(1, "CreateFile return invalid handle");
+        }
+        return false;
+    }
+
+    impl->hFile = hFile;
+
+    DWORD dwFileSize = GetFileSize(hFile, nullptr);
+
+    HANDLE hMapFile = CreateFileMapping(
+            hFile,
+            nullptr,
+            PAGE_READONLY,
+            0,
+            dwFileSize,
+            nullptr
+    );
+
+    if (hMapFile == NULL) {
+        CloseHandle(hFile);
+
+        if (error) {
+            *error = Error(2, "CreateFileMapping fail");
+        }
+
+        return false;
+    }
+
+    impl->hMapFile = hMapFile;
+
+    LPVOID lpFile = MapViewOfFile(
+            hMapFile,
+            FILE_MAP_READ,
+            0,
+            0,
+            dwFileSize
+    );
+
+    if (lpFile == nullptr) {
+        CloseHandle(hMapFile);
+        CloseHandle(hFile);
+
+        if (error) {
+            *error = Error(3, "MapViewOfFile fail");
+        }
+
+        return false;
+    }
+
+    // Use the memory mapped file here
+    _buffer = (const char *)lpFile;
 
 #else
     int fd = open(path.data(), O_RDONLY);
@@ -78,13 +149,27 @@ bool SourceFile::init(std::string_view path, Error *error) {
 SourceFile::~SourceFile() {
     if (impl) {
 
+#ifdef _WIN32
+        if (_buffer) {
+            UnmapViewOfFile((LPVOID)_buffer);
+            CloseHandle(impl->hMapFile);
+            CloseHandle(impl->hFile);
+
+            _buffer = nullptr;
+        }
+
+#else
         if (_buffer) {
             if (munmap((void *)_buffer, impl->len) == -1) {
                 std::cerr << "Fail to unmap file at buffer" << (void *)_buffer << '\n';
             }
+
+            close(impl->fd);
+
+            _buffer = nullptr;
         }
 
-        close(impl->fd);
+#endif
 
         delete impl;
         impl = nullptr;
