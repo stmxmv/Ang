@@ -1,4 +1,11 @@
-### How to compile:
+# Ang : My Principle of Compiler Learning Path
+
+## Contents
+1. a C++ Lexer
+2. a Grammar lexer and parser
+3. ......
+
+## Build Instructions:
 
 1. install cmake
 2. run following commands in a terminal:
