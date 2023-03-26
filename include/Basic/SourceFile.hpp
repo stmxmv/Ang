@@ -28,7 +28,10 @@ public:
 
     SourceFile();
 
+    /// equivalent to open
     bool init(std::string_view path, Error *error = nullptr);
+
+    bool open(std::string_view path, Error *error = nullptr);
 
     ~SourceFile();
 
@@ -36,6 +39,7 @@ public:
         return _buffer;
     }
 
+    void close();
 
 };
 
