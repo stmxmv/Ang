@@ -113,11 +113,11 @@ static std::string preprocess_regex(std::string_view str) {
     return result;
 }
 
-std::string RegEx::convertToPostfix(std::string_view str) {
-    std::string const preprocessed = preprocess_regex(str);
-    if (preprocessed.empty()) { return {}; }
 
-    std::string result;
+static void convertToPostfix(std::string_view str, std::string &result) {
+    std::string const preprocessed = preprocess_regex(str);
+    if (preprocessed.empty()) { return; }
+
     std::stack<char> stk;
     for (char const ch : preprocessed) {
         if (charinfo::isAlNum(ch)) {
@@ -161,15 +161,16 @@ std::string RegEx::convertToPostfix(std::string_view str) {
     }
 
 
-    return result;
+    return;
 
 __error:
     std::cout << "Regex grammar error" << std::endl;
-    return {};
+//    return {};
 }
 
 std::unique_ptr<NFA> RegEx::parse(std::string_view raw_str) {
-    std::string str = convertToPostfix(raw_str);
+    std::string str;
+    convertToPostfix(raw_str, str);
 
     std::stack<NFA> nfaStack;
 

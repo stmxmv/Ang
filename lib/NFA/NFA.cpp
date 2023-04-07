@@ -58,9 +58,48 @@ bool NFA::match(std::string_view str) {
     return std::ranges::any_of(stateSets, [this](uint32_t id) { return isAcceptedState(id); });
 }
 
-std::string NFA::getPrettyString() const {
+namespace {
 
-    gatherNFAStatesAndInputs();
+void addStateIfNotExist(uint32_t id, std::vector<uint32_t> &stateIds) {
+    if (std::find(stateIds.begin(), stateIds.end(), id) == stateIds.end()) {
+        stateIds.insert(std::lower_bound(stateIds.begin(), stateIds.end(), id), id);
+    }
+}
+
+void gatherState(uint32_t id,
+                 std::vector<uint32_t> &stateIds,
+                 std::unordered_set<std::string_view> &inputs,
+                 std::unordered_set<uint32_t> &vis,
+                 StateManager &stateManager) {
+    addStateIfNotExist(id, stateIds);
+    vis.insert(id);
+    State const & state = stateManager.getState(id);
+    for (const auto &trans : state.getTransitions()) {
+        inputs.insert(trans.input);
+        if (vis.find(trans.nextStatId) == vis.end()) {
+            gatherState(trans.nextStatId, stateIds, inputs, vis, stateManager);
+        }
+    }
+
+}
+
+void gatherNFAStatesAndInputs(uint32_t initialStatId,
+                              std::vector<uint32_t> &stateIds,
+                              std::unordered_set<std::string_view> &inputs,
+                              StateManager &stateManager) {
+    inputs.clear();
+    std::unordered_set<uint32_t> vis;
+    gatherState(initialStatId, stateIds, inputs, vis, stateManager);
+}
+
+
+}
+
+std::string NFA::getPrettyString() const {
+    std::vector<uint32_t> stateIds;
+    std::unordered_set<std::string_view> inputs;
+
+    gatherNFAStatesAndInputs(initialStatId, stateIds, inputs, stateManager);
 
     std::string result;
     result.append("K = { ");

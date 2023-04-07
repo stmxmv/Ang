@@ -73,13 +73,15 @@ public:
         return rawData.c_str();
     }
 
+    /// \brief equivalent to StateManager::associateStateWithString
     void setRawData(std::string_view str);
 };
 
 
 class StateManager : private NonCopyable {
 
-    std::vector<std::unique_ptr<State>> states; // state.id is the index of this array
+    /// state.id is the index of this array
+    std::vector<std::unique_ptr<State>> states;
     std::unordered_map<std::string_view, uint32_t> stringStateIdMap;
 
 public:
@@ -104,7 +106,10 @@ public:
     }
 
     void associateStateWithString(uint32_t id, std::string_view str) {
-        stringStateIdMap[str] = id;
+        if (states.size() - 1 >= id) {
+            states[id]->rawData = str;
+            stringStateIdMap[str] = id;
+        }
     }
 
     uint32_t getStateNum() const {

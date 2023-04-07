@@ -19,8 +19,6 @@ public:
 
     explicit RegEx(StateManager &stateManager) : stateManager(stateManager) {}
 
-    std::string convertToPostfix(std::string_view str);
-
     std::unique_ptr<NFA> parse(std::string_view str);
 
 };

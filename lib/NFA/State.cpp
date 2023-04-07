@@ -7,7 +7,6 @@
 namespace AN::NFA {
 
 void State::setRawData(std::string_view str) {
-    rawData = str;
     stateManager.associateStateWithString(id, str);
 }
 

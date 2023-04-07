@@ -18,43 +18,14 @@ class NFA {
 
     StateManager &stateManager;
 
-    mutable std::vector<uint32_t> stateIds;
-    mutable std::unordered_set<std::string_view> inputs;
-
     uint32_t initialStatId;
     std::vector<uint32_t> acceptedStatIds;
-
-    void addStateIfNotExist(uint32_t id) const {
-        if (std::find(stateIds.begin(), stateIds.end(), id) == stateIds.end()) {
-            stateIds.insert(std::lower_bound(stateIds.begin(), stateIds.end(), id), id);
-        }
-    }
-
-    void gatherState(uint32_t id, std::unordered_set<uint32_t> &vis) const {
-        addStateIfNotExist(id);
-        vis.insert(id);
-        State const & state = stateManager.getState(id);
-        for (const auto &trans : state.getTransitions()) {
-            inputs.insert(trans.input);
-            if (vis.find(trans.nextStatId) == vis.end()) {
-                gatherState(trans.nextStatId, vis);
-            }
-        }
-
-    }
-
-    void gatherNFAStatesAndInputs() const {
-        inputs.clear();
-        std::unordered_set<uint32_t> vis;
-        gatherState(initialStatId, vis);
-    }
 
 public:
 
     /// \brief construct a new NFA instance with an newly-created initial state and no accepted states
     explicit NFA(StateManager &stateManager) : stateManager(stateManager) {
         initialStatId = stateManager.newState().getId();
-        addStateIfNotExist(initialStatId);
     }
 
     State &getInitialState() const {
@@ -63,7 +34,6 @@ public:
 
     void addAcceptedState(uint32_t id) {
         if (std::find(acceptedStatIds.begin(), acceptedStatIds.end(), id) == acceptedStatIds.end()) {
-            addStateIfNotExist(id);
             acceptedStatIds.push_back(id);
         }
     }

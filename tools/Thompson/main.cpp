@@ -49,7 +49,7 @@ int main(int argc, const char *argv[]) {
     nfa->getInitialState().setRawData("S");
     int cnt = 0;
     for (const auto &state : stateManager.getStates()) {
-        if (state->getRawData()) {
+        if (*state->getRawData() == 0) {
             state->setRawData(std::string(1, 'A' + (cnt++)));
         }
     }
