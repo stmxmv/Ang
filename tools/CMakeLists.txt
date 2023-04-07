@@ -1,6 +1,3 @@
-add_subdirectory(CppScanner)
-add_subdirectory(TextFilter)
-add_subdirectory(Grammar)
 add_subdirectory(Unsigned)
 add_subdirectory(NFA)
 add_subdirectory(Thompson)
