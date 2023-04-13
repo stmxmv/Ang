@@ -61,7 +61,7 @@ int main(int argc, const char *argv[]) {
         return -1;
     }
 
-    AN::grammar::ASTContext context;
+    AN::ASTContext context;
     AN::grammar::Lexer lexer(file.getBuffer());
     AN::grammar::Parser parser(context, lexer);
 

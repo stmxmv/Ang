@@ -1,18 +1,22 @@
 //
-// Created by aojoie on 3/1/2023.
+// Created by aojoie on 4/11/2023.
 //
 
 #ifndef ANG_PARSER_HPP
 #define ANG_PARSER_HPP
 
-#include "Grammar/Lexer.hpp"
-#include "Grammar/Grammar.hpp"
-#include "Grammar/AST.hpp"
-#include <memory>
+#include <Ang/Lexer.hpp>
+#include <Ang/AST.hpp>
 #include <unordered_map>
-#include <unordered_set>
+#include <vector>
+#include <string>
+#include <set>
 
-namespace AN::grammar {
+namespace AN {
+
+typedef std::unordered_map<std::string,
+                           std::unordered_map<std::string,
+                                              std::vector<std::string>>> LL1Map;
 
 class Parser {
 
@@ -21,7 +25,6 @@ class Parser {
     Lexer &lexer;
     Token token;
 
-    std::unordered_map<std::string_view, Symbol *> symbol_map;
 
     void advance() {
         lexer.next(token);
@@ -52,16 +55,16 @@ class Parser {
         return true;
     }
 
-    Symbol *getSymbol(std::string_view val) {
-        if (auto iter = symbol_map.find(val); iter != symbol_map.end()) {
-            return iter->second;
-        }
-        return nullptr;
-    }
+    Expr *parseExpr();
 
-    GrammarTitle *parseGrammarTitle();
+    Term *parseTerm();
 
-    std::vector<Production *> parseProduction();
+    ExprP *parseExprP();
+
+    TermP *parseTermP();
+
+    Factor *parseFactor();
+
 
 public:
 
@@ -69,10 +72,14 @@ public:
         advance();
     }
 
-    Grammar *parse();
 
-    AST *parseAST();
+    AST *parseSimpleExpr();
+
+    std::string parseSimpleExpr(const LL1Map &map,
+                                const std::set<std::string> &tSymbols,
+                                std::string_view startSymbol);
 };
+
 
 
 }

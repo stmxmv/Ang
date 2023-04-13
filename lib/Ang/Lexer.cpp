@@ -159,6 +159,7 @@ start:
             } else if (*(curPtr + 1) == '=') {
                 formToken(result, curPtr + 2, tok::plus_equal);
             } else {
+                formToken(result, curPtr + 1, tok::plus);
             }
 
             return;

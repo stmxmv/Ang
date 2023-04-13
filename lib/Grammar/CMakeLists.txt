@@ -3,5 +3,7 @@ add_an_library(
         Lexer.cpp
         Parser.cpp
         Grammar.cpp
-        ASTContext.cpp
+        AST.cpp
 )
+
+target_link_libraries(libgrammar PUBLIC Basic)

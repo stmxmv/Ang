@@ -5,7 +5,7 @@
 #ifndef ANG_GRAMMER_HPP
 #define ANG_GRAMMER_HPP
 
-#include "Grammar/ASTContext.hpp"
+#include "Basic/ASTContext.hpp"
 
 #include <string>
 #include <string_view>
@@ -27,7 +27,7 @@ enum GrammarType : unsigned long {
     GrammarTypeRG       = 1 << 5,
 };
 
-class Symbol : public ASTAllocated<Symbol> {
+class Symbol : public ASTAllocated {
     std::string_view val;
 public:
     enum SymbolKind { UnknownSymbol, TSymbol, VSymbol };
@@ -60,7 +60,7 @@ private:
     ValueType valueType;
 };
 
-class Production : public ASTAllocated<Production> {
+class Production : public ASTAllocated {
     std::vector<Symbol *> left_symbols;
     std::vector<Symbol *> right_symbols;
 
@@ -82,7 +82,7 @@ public:
 
 };
 
-class GrammarTitle : public ASTAllocated<GrammarTitle> {
+class GrammarTitle : public ASTAllocated {
     std::string_view name;
     Symbol *start_symbol;
 public:
@@ -98,7 +98,7 @@ public:
     std::string getPrettyString() const;
 };
 
-class Grammar : public ASTAllocated<Grammar> {
+class Grammar : public ASTAllocated {
     GrammarTitle *grammarTitle;
     std::vector<Production *> products;
     std::unordered_map<std::string_view, Symbol *> symbol_map;

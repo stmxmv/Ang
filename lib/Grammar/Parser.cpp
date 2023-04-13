@@ -150,6 +150,65 @@ Grammar *Parser::parse() {
     return grammar;
 }
 
+AST *Parser::parseAST() {
+    /// we do not use the grammar title
+    GrammarTitle *grammarTitle [[maybe_unused]] = parseGrammarTitle();
+
+    if (!expect(tok::identifier)) {
+        std::cout << "Not start symbol provided" << std::endl;
+        return nullptr;
+    }
+
+    VSymbol *root = new (context) VSymbol(token.getRawData());
+
+    std::unordered_map<std::string_view, VSymbol*> symbolMap;
+    symbolMap[root->getName()] = root;
+
+    while (token.isNot(tok::eof)) {
+        if (!expect(tok::identifier)) {
+            goto __error;
+        }
+
+        if (!symbolMap.contains(token.getRawData())) {
+            std::cout << "Grammar syntax error: Undefined V Symbol " << token.getRawData() << std::endl;
+            goto __error;
+        }
+
+        VSymbol *vSymbol = symbolMap[token.getRawData()];
+        advance();
+
+        if (!consume(tok::separator)) {
+            goto __error;
+        }
+
+        while (token.isOneOf(SYMBOL_TOKEN_TYPE)) {
+            if (token.is(tok::identifier)) {
+                /// V symbol
+                VSymbol *symbol = new (context) VSymbol(token.getRawData());
+                symbolMap[symbol->getName()] = symbol;
+                vSymbol->addChild(symbol);
+            } else {
+                /// T symbol
+                TSymbol *symbol = new (context) TSymbol(token.getRawData());
+                vSymbol->addChild(symbol);
+            }
+            advance();
+        }
+
+        if (!consume(tok::delimiter)) {
+            goto __error;
+        }
+    }
+
+    return root;
+
+__error:
+    while (token.isNot(tok::eof)) {
+        advance();
+    }
+    return nullptr;
+}
+
 
 void Parser::error() {
     std::cout << "Unexpected" << token.getRawData() << '\n';
