@@ -23,6 +23,8 @@ Checks: '-*, clang-analyzer-*, clang-diagnostic-*, misc-*,performance-*,moderniz
          -modernize-use-trailing-return-type,
          -misc-non-private-member-variables-in-classes,
          -misc-no-recursion,
+         -misc-const-correctness,
+         -misc-use-anonymous-namespace,
          -readability-implicit-bool-conversion,
          -readability-identifier-naming,
          -modernize-use-default-member-init,
@@ -42,6 +44,10 @@ CheckOptions:
     value: 0
   - key: readability-identifier-length.MinimumParameterNameLength
     value: 0
+  - key: readability-function-cognitive-complexity.Threshold
+    value: 100
+  - key: readability-braces-around-statements.ShortStatementLines
+    value: 1
 #  - key:             readability-identifier-naming.ClassCase
 #    value:           CamelCase, lower_case
 #  - key:             readability-identifier-naming.EnumCase

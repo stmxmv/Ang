@@ -12,6 +12,8 @@
 #include <utility>
 #include <vector>
 #include <unordered_map>
+#include <algorithm>
+#include <ranges>
 
 namespace AN::grammar {
 
@@ -43,6 +45,13 @@ public:
         return val;
     }
 
+    std::string_view getCharLiteral() const {
+        std::string_view ret(val);
+        ret.remove_prefix(1);
+        ret.remove_suffix(1);
+        return ret;
+    }
+
     SymbolKind getSymbolKind() const {
         return symbolKind;
     }
@@ -63,11 +72,11 @@ private:
 class Production : public ASTAllocated {
     std::vector<Symbol *> left_symbols;
     std::vector<Symbol *> right_symbols;
-
+    int id;
 public:
-    Production(std::vector<Symbol *> leftSymbols,
+    Production(int aId, std::vector<Symbol *> leftSymbols,
                std::vector<Symbol *> rightSymbols)
-        : left_symbols(std::move(leftSymbols)), right_symbols(std::move(rightSymbols)) {}
+        : id(aId), left_symbols(std::move(leftSymbols)), right_symbols(std::move(rightSymbols)) {}
 
     GrammarType getType() const;
 
@@ -80,6 +89,7 @@ public:
 
     std::string getPrettyString() const;
 
+    int getID() const { return id; }
 };
 
 class GrammarTitle : public ASTAllocated {
@@ -122,6 +132,16 @@ public:
 
     const std::vector<Production *> &getProductions() const {
         return products;
+    }
+
+    const Production *getProduction(int id) const {
+        return *std::find_if(products.begin(), products.end(), [id](auto &&prop) { return prop->getID() == id; });
+    }
+
+    auto getAllTSymbols() const {
+        return symbol_map |
+               std::views::values |
+               std::views::filter([](auto &&sym) { return sym->getSymbolKind() == Symbol::TSymbol; });
     }
 
     std::string getPrettyString() const;

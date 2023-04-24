@@ -64,6 +64,7 @@ __error:
 }
 
 std::vector<Production *> Parser::parseProduction() {
+    ++productionID;
     std::vector<Production *> productions;
     std::vector<Symbol *> pro_left_symbols, pro_right_symbols;
 
@@ -91,7 +92,7 @@ std::vector<Production *> Parser::parseProduction() {
 
     /// right side can have no symbols ( epsilon )
     if (token.is(tok::alter)) {
-        productions.push_back(new(context) Production(pro_left_symbols, {}));
+        productions.push_back(new(context) Production(productionID, pro_left_symbols, {}));
         advance();
     }
 
@@ -107,14 +108,14 @@ std::vector<Production *> Parser::parseProduction() {
         advance();
 
         if (token.is(tok::alter)) {
-            Production *production = new(context) Production(pro_left_symbols, pro_right_symbols);
+            Production *production = new(context) Production(productionID, pro_left_symbols, pro_right_symbols);
             productions.push_back(production);
             pro_right_symbols.clear();
             advance();
 
             /// right side can have no symbols ( epsilon )
             while (token.is(tok::alter)) {
-                productions.push_back(new(context) Production(pro_left_symbols, {}));
+                productions.push_back(new(context) Production(productionID, pro_left_symbols, {}));
                 advance();
             }
         }
@@ -124,7 +125,7 @@ std::vector<Production *> Parser::parseProduction() {
         goto __error;
     }
 
-    productions.push_back(new(context) Production(pro_left_symbols, pro_right_symbols));
+    productions.push_back(new(context) Production(productionID, pro_left_symbols, pro_right_symbols));
 
     return productions;
 

@@ -21,6 +21,8 @@ class Parser {
     Lexer &lexer;
     Token token;
 
+    int productionID{};
+
     std::unordered_map<std::string_view, Symbol *> symbol_map;
 
     void advance() {
