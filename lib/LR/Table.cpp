@@ -4,6 +4,7 @@
 
 #include "LR/Table.hpp"
 
+#include <iomanip>
 #include <unordered_set>
 #include <format>
 
@@ -28,8 +29,11 @@ std::ostream &operator<< (std::ostream &os, const Table &table) {
 
     os << "actionMap" << '\n';
     os << "id";
+
+    static constexpr int width = 5;
+
     for (auto &&col : actionCols) {
-        os << ' ' << col;
+        os << ' ' << std::setw(width) << col;
     }
     os << '\n';
     for (auto &&[id, map] : table.actionMap) {
@@ -39,17 +43,17 @@ std::ostream &operator<< (std::ostream &os, const Table &table) {
                 Action action = map.at(col);
                 switch (action.type) {
                     case kActionTypeShift:
-                        os << 'S' << action.value;
+                        os << std::setw(width) << 'S' << action.value;
                         break;
                     case kActionTypeReduce:
-                        os << 'R' << action.value;
+                        os << std::setw(width) << 'R' << action.value;
                         break;
                     case kActionTypeAcc:
-                        os << "Acc";
+                        os << std::setw(width) << "Acc";
                         break;
                 }
             } else {
-                os << ' ';
+                os << std::setw(width + 1) << ' ';
             }
             os << ' ';
         }
@@ -60,12 +64,13 @@ std::ostream &operator<< (std::ostream &os, const Table &table) {
     os << "gotoMap" << '\n';
     os << "id";
     for (auto &&col : gotoCols) {
-        os << ' ' << col;
+        os << ' ' << std::setw(width) << col;
     }
     os << '\n';
     for (auto &&[id, map] : table.gotoMap) {
         os << id;
         for (auto &&col : gotoCols) {
+            os << std::setw(width);
             if (map.contains(col)) {
                 os << ' ' << map.at(col);
             } else {

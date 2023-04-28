@@ -9,8 +9,8 @@
 #include <unordered_set>
 
 #include <ostream>
-#include <span>
 #include <set>
+#include <span>
 
 namespace AN::LR {
 
@@ -53,7 +53,6 @@ public:
 
     bool hasNext() const { return dot_pos < rights.size(); }
 
-    /// get the next val if hasNext() == true
     std::string_view getNextVal() const { return rights[dot_pos]->getVal(); }
 
     const grammar::Production *getProduction() const { return _production; }
@@ -68,7 +67,7 @@ public:
         return !(rhs == *this);
     }
 
-    bool operator < (const Item &other) const {
+    bool operator< (const Item &other) const {
         return _production->getID() * 10 + dot_pos < other._production->getID() * 10 + other.dot_pos;
     }
 };
@@ -85,7 +84,7 @@ struct std::hash<AN::LR::Item> {
 namespace AN::LR {
 
 class State {
-    int                      id;
+    int            id;
     std::set<Item> commonItems;
     std::set<Item> _items;/// include closure
 

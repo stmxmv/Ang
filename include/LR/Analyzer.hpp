@@ -20,7 +20,7 @@ class Analyzer {
 
 public:
 
-    explicit Analyzer(Table table, const grammar::Grammar *grammar)
+    Analyzer(Table table, const grammar::Grammar *grammar)
         : _table(std::move(table)), _grammar(grammar) {}
 
     void analyze(std::string_view str, std::ostream &os);
